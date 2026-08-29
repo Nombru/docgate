@@ -1,0 +1,5 @@
+node_modules/
+*.docx
+*.pdf
+docgate.config.json
+.DS_Store

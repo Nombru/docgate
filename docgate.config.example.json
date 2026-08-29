@@ -1,0 +1,23 @@
+{
+  "root": "./documents",
+  "sourcePattern": "^(Report|Letter|Brief)",
+  "frozen": [
+    "2026-Q1 - Board Report"
+  ],
+  "archivePattern": "^Superseded ",
+  "retractedFigures": {
+    "pre-correction NPS": "NPS\\\\s*(of\\\\s*)?7[0-9]",
+    "withdrawn cost claim": "(saved|cut)\\\\w*[^.]{0,30}\\\\$2\\\\.4M"
+  },
+  "artifactAliases": {
+    "Report-Baseline": "Company Annual Report"
+  },
+  "author": {
+    "name": "Your Name",
+    "contact": [
+      "555.867.5309",
+      "you@example.com",
+      "linkedin.com/in/you"
+    ]
+  }
+}

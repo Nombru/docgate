@@ -1,0 +1,8 @@
+{
+  "name": "docgate",
+  "version": "1.0.0",
+  "description": "Render Markdown to DOCX, and refuse to ship an artifact that drifted from its source.",
+  "license": "MIT",
+  "scripts": { "check": "node lib/check-drift.js", "gate": "node lib/check-drift.js --strict" },
+  "dependencies": { "docx": "^8.5.0" }
+}
