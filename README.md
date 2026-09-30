@@ -9,18 +9,18 @@ wrong. The gate is the interesting half.
 ## Why it exists
 
 A corpus of documents was maintained as Markdown and delivered as PDF. Each render was a
-hand-transcription — someone opened a Word file and retyped the changes. It worked, in the way
-that things work right up until you check them.
+hand-transcription: someone opened a Word file and retyped the changes. Nobody checked the PDFs against
+the Markdown, so nobody knew whether they matched.
 
 An audit found two failures in the same corpus. One PDF was silently **missing three passages its
 Markdown had**, because a page-fit trim was made at render time and never travelled back to the
 source. Another PDF that had already been sent to a recipient carried **a line that appeared in no
-Markdown file at all** — typed directly into the artifact, months earlier, by someone who has since
-forgotten doing it.
+Markdown file at all**. It was typed directly into the artifact months earlier, by someone who has
+since forgotten doing it.
 
 Neither was caught by review, because review reads the source and assumes the artifact matches.
 
-The fix was structural rather than procedural. Parsers read the Markdown and generate the
+The fix was structural. Parsers read the Markdown and generate the
 artifacts, so there is exactly one copy of the words and a render cannot diverge from its source.
 Then a gate makes the remaining failure modes cheap to detect.
 
@@ -29,18 +29,18 @@ Then a gate makes the remaining failure modes cheap to detect.
 | Finding | Meaning |
 |---|---|
 | `STALE` | The source is newer than the artifact beside it. The artifact is out of date. |
-| `ORPHAN` | An artifact with no source. It cannot be regenerated or verified — where does it come from? |
-| `ATS` | Arrow glyphs reached the output. They break automated parsers downstream. |
+| `ORPHAN` | An artifact with no source. It cannot be regenerated or verified, and nothing records where it came from. |
+| `ATS` | Arrow glyphs reached the output. They break applicant tracking systems (ATS) and other automated parsers downstream. |
 | `MARKDOWN` | Literal `**`, `*` or `#` leaked into the rendered text. A parser bug that review will not see. |
-| `NOTES` | Editorial scaffolding survived — `TODO`, `delete before sending`, a draft banner. |
+| `NOTES` | Editorial scaffolding survived: `TODO`, `delete before sending`, a draft banner. |
 | `FIGURES` | A claim a later accuracy pass retracted is still present in the artifact. |
 
-That last one is the reason this exists at all. When a number is corrected in the source, the
+That last one is the check a normal workflow is least likely to have. When a number is corrected in the source, the
 already-rendered artifacts keep the old number, and nothing in a normal workflow notices. `FIGURES`
 turns "we corrected that" into something a machine verifies.
 
 ```bash
-node lib/check-drift.js --strict     # exit 1 on any material finding — use as a pre-ship hook
+node lib/check-drift.js --strict     # exit 1 on any material finding; use as a pre-ship hook
 ```
 
 ## Frozen documents
@@ -52,7 +52,7 @@ release.
 
 ## Configure
 
-Everything corpus-specific lives in `docgate.config.json` — nothing is hardcoded. Copy
+Everything corpus-specific lives in `docgate.config.json`, and nothing is hardcoded. Copy
 `docgate.config.example.json` and edit:
 
 ```json
@@ -74,7 +74,7 @@ node lib/render-resume.js "path/to/Resume.md"      # résumé layout
 node lib/render-coverletter.js "path/to/Letter.md" # letter layout, anchored on the salutation
 ```
 
-Each parser has a documented contract at the top of its file — which Markdown constructs map to
+Each parser has a documented contract at the top of its file: which Markdown constructs map to
 which document elements, and where it stops reading. The letter parser anchors on the greeting
 line, so anything above it is treated as notes and never rendered. That is deliberate: it lets a
 source file carry reviewer instructions that structurally cannot reach the output.
@@ -89,5 +89,5 @@ soffice --headless --convert-to pdf --outdir "$(dirname "$F")" "$F"
 
 There is no test suite. The parsers were verified by rendering a real corpus and diffing extracted
 PDF text against the sources, which is how the original drift was found, but that corpus is
-private. If you adopt this, write the round-trip test — render, `pdftotext`, compare — because it
-is the check that actually matters.
+private. If you adopt this, write the round-trip test (render, `pdftotext`, compare), because it
+is the check that catches drift in the parsers themselves.
